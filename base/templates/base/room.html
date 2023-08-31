@@ -4,7 +4,9 @@
 
 <h1>ROOM TEMPLATE</h1>
 
+<span>@{{ room.host.username }}</span>
 <h3>{{ room.name }}</h3>
 <h3>{{ room.id }}</h3>
+<span>{{ room.topic.name }}</span>
 
 {% endblock content %}
