@@ -9,15 +9,19 @@
   }
 </style>
 
-
 <div class="home-container">
 
   <div>
     <h3>Temas</h3>
     <hr>
+    <a href="{% url 'base:home'%}">Todos</a>
+    {% for topic in topics %}
+      <div>
+        <a href="{% url 'base:home'%}?q={{topic.name}}">{{ topic.name }}</a>
+      </div>
+    {% endfor %}
   </div>
-
-  <main>
+  <div>
     <a href="{% url 'base:create-room' %}">CREAR SALA</a>
 
     <div>
@@ -32,8 +36,7 @@
         </div>
       {% endfor %}
     </div>
-  </main>
-
+  </div>
 </div>
 
 {% endblock content %}
