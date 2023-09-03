@@ -14,10 +14,12 @@ def home(req):
     Q(description__icontains=q)
     )
   topics = Topic.objects.all().annotate(top_topics=Count('room')).order_by('-top_topics')
+  room_count = rooms.count()
 
   context = {
     'topics': topics,
-    'rooms': rooms
+    'rooms': rooms,
+    'room_count': room_count
   }
   return render(req, 'base/home.html', context)
 
