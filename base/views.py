@@ -1,9 +1,28 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db.models import Count, Q
+from django.contrib.auth.models import User
+from django.contrib import messages, auth
 
 from .models import Room, Topic
 from .forms import RoomForm
+
+def loginPage(req):
+  if req.method == 'POST':
+    username = req.POST.get('username')
+    password = req.POST.get('password')
+    try:
+      user = User.objects.get(username=username)
+    except:
+      messages.error(req, 'el Usuario no existe')
+    user = auth.authenticate(req, username=username, password=password)
+    if user is not None:
+      auth.login(req, user)
+      return redirect('base:home ')
+    else: 
+      messages.error(req, 'Usuario o contraseña invalida')
+  context = {}
+  return render(req, 'base/login_register.html', context)  
 
 def home(req):
   q = req.GET.get('q') if req.GET.get('q') != None else ''
