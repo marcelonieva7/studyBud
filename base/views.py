@@ -1,13 +1,18 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from .models import Room, Topic
 from .forms import RoomForm
 
 def home(req):
   q = req.GET.get('q') if req.GET.get('q') != None else ''
-  rooms = Room.objects.all().filter(topic__name__icontains=q)
+  rooms = Room.objects.all().filter(
+    Q(topic__name__icontains=q) | 
+    Q(name__icontains=q) |
+    Q(host__username__icontains=q) |
+    Q(description__icontains=q)
+    )
   topics = Topic.objects.all().annotate(top_topics=Count('room')).order_by('-top_topics')
 
   context = {
