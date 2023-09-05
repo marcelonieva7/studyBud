@@ -9,6 +9,7 @@
 
 {% if request.user.is_authenticated %}
   <a href="{% url 'base:logout' %}">Salir</a>
+  <p>Hola {{request.user.username}}</p>
 {% else %}
   <a href="{% url 'base:login' %}">Ingresar</a>
 {% endif %}
