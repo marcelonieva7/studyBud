@@ -8,7 +8,10 @@ from django.contrib.auth.decorators import  login_required
 from .models import Room, Topic
 from .forms import RoomForm
 
-def loginPage(req):
+def loginPage(req: HttpRequest):
+  if req.user.is_authenticated:
+    return redirect('base:home')
+
   if req.method == 'POST':
     username = req.POST.get('username')
     password = req.POST.get('password')
