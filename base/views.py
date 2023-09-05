@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from django.db.models import Count, Q
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import  login_required
 
@@ -9,11 +10,12 @@ from .models import Room, Topic
 from .forms import RoomForm
 
 def loginPage(req: HttpRequest):
+  page = 'login'
   if req.user.is_authenticated:
     return redirect('base:home')
 
   if req.method == 'POST':
-    username = req.POST.get('username')
+    username = req.POST.get('username').lower()
     password = req.POST.get('password')
     try:
       user = User.objects.get(username=username)
@@ -25,12 +27,30 @@ def loginPage(req: HttpRequest):
       return redirect('base:home')
     else: 
       messages.error(req, 'Usuario o contraseña invalida')
-  context = {}
+  context = {
+    'page': page
+  }
   return render(req, 'base/login_register.html', context)
 
 def logoutUser(req):
   auth.logout(req)
   return redirect('base:home')
+
+def registerPage(req: HttpRequest):
+  form = UserCreationForm()
+  if req.method == 'POST':
+    form = UserCreationForm(req.POST)
+    if form.is_valid():
+      user = form.save(commit=False)
+      user.username = user.username.lower()
+      user.save()
+      auth.login(req, user)
+      return redirect('base:login')
+    else:
+      messages.error(req, 'Ocurrio un error durante la registracion')
+
+  context = {'form': form}  
+  return render(req, 'base/login_register.html', context)
 
 def home(req):
   q = req.GET.get('q') if req.GET.get('q') != None else ''
