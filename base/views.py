@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.db.models import Count, Q
 from django.contrib.auth.models import User
 from django.contrib import messages, auth
+from django.contrib.auth.decorators import  login_required
 
 from .models import Room, Topic
 from .forms import RoomForm
@@ -50,6 +51,7 @@ def room(req, pk):
   room = Room.objects.get(id=pk)
   return render(req, 'base/room.html', context={'room': room})
 
+@login_required(login_url='/login')
 def createRoom(req):
   form = RoomForm()
 
@@ -61,9 +63,14 @@ def createRoom(req):
   context = {'form': form}
   return render(req, 'base/room_form.html', context)
 
-def updateRoom(req, pk):
+@login_required(login_url='base:login')
+def updateRoom(req: HttpRequest, pk):
   room = Room.objects.get(id=pk)
   form = RoomForm(instance=room)
+
+  if req.user != room.host:
+    messages.error(req, 'Accion no permitida')
+    return redirect('base:home')
 
   if req.method == 'POST':
     form = RoomForm(req.POST, instance=room)
@@ -74,8 +81,13 @@ def updateRoom(req, pk):
   context = {'form': form}
   return render(req, 'base/room_form.html', context)
 
+@login_required(login_url='base:login')
 def deleteRoom(req, pk): 
   room = Room.objects.get(id=pk)
+
+  if req.user != room.host:
+    messages.error(req, 'Accion no permitida')
+    return redirect('base:home')
 
   if req.method == 'POST':
     room.delete()
