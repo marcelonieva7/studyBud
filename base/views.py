@@ -18,11 +18,15 @@ def loginPage(req):
     user = auth.authenticate(req, username=username, password=password)
     if user is not None:
       auth.login(req, user)
-      return redirect('base:home ')
+      return redirect('base:home')
     else: 
       messages.error(req, 'Usuario o contraseña invalida')
   context = {}
-  return render(req, 'base/login_register.html', context)  
+  return render(req, 'base/login_register.html', context)
+
+def logoutUser(req):
+  auth.logout(req)
+  return redirect('base:home')
 
 def home(req):
   q = req.GET.get('q') if req.GET.get('q') != None else ''
