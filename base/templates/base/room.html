@@ -2,11 +2,29 @@
 
 {% block content %}
 
-<h1>ROOM TEMPLATE</h1>
+<h1>{{ room.name }}</h1>
+<p>{{room.description}}</p>
 
-<span>@{{ room.host.username }}</span>
-<h3>{{ room.name }}</h3>
-<h3>{{ room.id }}</h3>
-<span>{{ room.topic.name }}</span>
+<div class="comment-wrapper">
+  <h3>Conversacion</h3>
+  <hr>
+  {% for msg in room_messages %}
+    <div>
+      <small>@{{msg.user}} hace {{msg.created|timesince}}</small>
+      <p>{{msg.body}}</p>
+      <hr>
+    </div>
+  {% endfor %}
+
+  {% if request.user.is_authenticated %}
+  <div class="comment-form">
+    <form action="" method="post">
+      {% csrf_token %}
+      {{form.as_p}}
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
 
 {% endblock content %}
