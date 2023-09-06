@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse, HttpRequest
 from django.db.models import Count, Q
 from django.contrib.auth.models import User
@@ -7,7 +7,7 @@ from django.contrib import messages, auth
 from django.contrib.auth.decorators import  login_required
 
 from .models import Room, Topic
-from .forms import RoomForm
+from .forms import RoomForm, CommentForm
 
 def loginPage(req: HttpRequest):
   page = 'login'
@@ -70,9 +70,26 @@ def home(req):
   }
   return render(req, 'base/home.html', context)
 
-def room(req, pk):
+def room(req: HttpRequest, pk):
   room = Room.objects.get(id=pk)
-  return render(req, 'base/room.html', context={'room': room})
+  room_messages = room.message_set.all().order_by('-created')
+
+  form = CommentForm()
+
+  if req.method == 'POST':
+    form = CommentForm(req.POST)
+    if form.is_valid:
+      msg = form.save(commit=False)
+      msg.room = room
+      msg.user = req.user
+      msg.save()
+      return redirect(reverse('base:room', kwargs={'pk':pk}))
+  context = {
+    'form': form,
+    'room': room,
+    'room_messages': room_messages
+  }
+  return render(req, 'base/room.html', context)
 
 @login_required(login_url='/login')
 def createRoom(req):
