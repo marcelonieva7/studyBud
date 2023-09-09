@@ -18,6 +18,9 @@
       <hr>
       {% for msg in room_messages %}
         <div>
+          {% if request.user == msg.user %}
+            <a href="{% url 'base:delete-message' msg.id %}">Borrar</a>
+          {% endif %}
           <small>@{{msg.user}} hace {{msg.created|timesince}}</small>
           <p>{{msg.body}}</p>
           <hr>
