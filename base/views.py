@@ -84,6 +84,7 @@ def room(req: HttpRequest, pk):
       msg.room = room
       msg.user = req.user
       msg.save()
+      room.participants.add(req.user)
       return redirect(reverse('base:room', kwargs={'pk':pk}))
   context = {
     'form': form,
