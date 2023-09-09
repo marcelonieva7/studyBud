@@ -2,29 +2,48 @@
 
 {% block content %}
 
-<h1>{{ room.name }}</h1>
-<p>{{room.description}}</p>
+<style>
+  .room-container{
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+  }
+</style>
 
-<div class="comment-wrapper">
-  <h3>Conversacion</h3>
-  <hr>
-  {% for msg in room_messages %}
-    <div>
-      <small>@{{msg.user}} hace {{msg.created|timesince}}</small>
-      <p>{{msg.body}}</p>
+<div class="room-container">
+  <div>
+    <h1>{{ room.name }}</h1>
+    <p>{{room.description}}</p>
+    <div class="comment-wrapper">
+      <h3>Conversacion</h3>
       <hr>
+      {% for msg in room_messages %}
+        <div>
+          <small>@{{msg.user}} hace {{msg.created|timesince}}</small>
+          <p>{{msg.body}}</p>
+          <hr>
+        </div>
+      {% endfor %}
     </div>
-  {% endfor %}
-
-  {% if request.user.is_authenticated %}
-  <div class="comment-form">
-    <form action="" method="post">
-      {% csrf_token %}
-      {{form.as_p}}
-      <button type="submit">Enviar</button>
-    </form>
+    {% if request.user.is_authenticated %}
+    <div class="comment-form">
+      <form action="" method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+    {% endif %}
   </div>
-  {% endif %}
+
+  <div>
+    <h3>Participantes</h3>
+    {% for part in participants %}
+      <div>
+        <p>@{{part.username}}</p>
+      </div>
+    {% endfor %}
+    <hr>
+  </div>
 </div>
 
 {% endblock content %}
