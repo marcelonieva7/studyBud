@@ -1,4 +1,4 @@
-from django.forms import ModelForm, Textarea
+from django.forms import ModelForm, Textarea, HiddenInput
 
 from.models import Room, Message
 
@@ -10,9 +10,11 @@ class RoomForm(ModelForm):
 class CommentForm(ModelForm):
   class Meta:
     model = Message
-    fields = ['body']
+    fields = '__all__'
     widgets = {
-      'body': Textarea(attrs={'placeholder': 'Escribe tu comentario....'})
+      'body': Textarea(attrs={'placeholder': 'Escribe tu comentario....'}),
+      'user': HiddenInput(),
+      'room': HiddenInput(),
     }
     labels = {
       'body': ''
