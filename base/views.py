@@ -73,6 +73,7 @@ def home(req):
 def room(req: HttpRequest, pk):
   room = Room.objects.get(id=pk)
   room_messages = room.message_set.all().order_by('-created')
+  participants = room.participants.all()
 
   form = CommentForm()
 
@@ -87,7 +88,8 @@ def room(req: HttpRequest, pk):
   context = {
     'form': form,
     'room': room,
-    'room_messages': room_messages
+    'room_messages': room_messages,
+    'participants': participants
   }
   return render(req, 'base/room.html', context)
 
