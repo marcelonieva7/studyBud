@@ -75,15 +75,12 @@ def room(req: HttpRequest, pk):
   room_messages = room.message_set.all().order_by('-created')
   participants = room.participants.all()
 
-  form = CommentForm()
+  form = CommentForm(initial={'user': req.user, 'room': room})
 
   if req.method == 'POST':
     form = CommentForm(req.POST)
     if form.is_valid:
-      msg = form.save(commit=False)
-      msg.room = room
-      msg.user = req.user
-      msg.save()
+      msg = form.save()
       room.participants.add(req.user)
       return redirect(reverse('base:room', kwargs={'pk':pk}))
   context = {
@@ -104,7 +101,7 @@ def createRoom(req):
       form.save()
       return redirect('base:home')
   context = {'form': form}
-  return render(req, 'base/room_form.html', context)
+  return render(req, 'base/form.html', context)
 
 @login_required(login_url='base:login')
 def updateRoom(req: HttpRequest, pk):
@@ -122,7 +119,7 @@ def updateRoom(req: HttpRequest, pk):
       return redirect('base:home')
   
   context = {'form': form}
-  return render(req, 'base/room_form.html', context)
+  return render(req, 'base/form.html', context)
 
 @login_required(login_url='base:login')
 def deleteRoom(req, pk): 
@@ -152,3 +149,24 @@ def deleteMsg(req, pk):
     return redirect('base:room', pk=room_id)
   
   return render(req, 'base/delete.html', {'obj': msg})
+
+@login_required(login_url='base:login')
+def editMsg(req, pk): 
+  msg = Message.objects.get(id=pk)
+  room_id = msg.room.pk
+  form = CommentForm(instance=msg)
+
+  if req.user != msg.user:
+    messages.error(req, 'Accion no permitida')
+    return redirect('base:room', pk=room_id)
+
+  if req.method == 'POST':
+    form = CommentForm(req.POST, instance=msg)
+    if form.is_valid:
+      form.save()
+      return redirect('base:room', pk=room_id)
+
+  context = {
+    'form': form
+  }  
+  return render(req, 'base/form.html', context)
