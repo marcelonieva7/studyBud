@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import  login_required
 
-from .models import Room, Topic
+from .models import Room, Topic, Message
 from .forms import RoomForm, CommentForm
 
 def loginPage(req: HttpRequest):
@@ -137,3 +137,18 @@ def deleteRoom(req, pk):
     return redirect('base:home')
   
   return render(req, 'base/delete.html', {'obj': room})
+
+@login_required(login_url='base:login')
+def deleteMsg(req, pk): 
+  msg = Message.objects.get(id=pk)
+  room_id = msg.room.pk
+
+  if req.user != msg.user:
+    messages.error(req, 'Accion no permitida')
+    return redirect('base:room', pk=room_id)
+
+  if req.method == 'POST':
+    msg.delete()
+    return redirect('base:room', pk=room_id)
+  
+  return render(req, 'base/delete.html', {'obj': msg})
