@@ -62,11 +62,13 @@ def home(req):
     )
   topics = Topic.objects.all().annotate(top_topics=Count('room')).order_by('-top_topics')
   room_count = rooms.count()
+  room_msg = Message.objects.all()
 
   context = {
     'topics': topics,
     'rooms': rooms,
-    'room_count': room_count
+    'room_count': room_count,
+    'room_msg': room_msg
   }
   return render(req, 'base/home.html', context)
 
