@@ -52,8 +52,8 @@
         {% if request.user == msg.user %}
         <a href="{% url 'base:delete-message' msg.id %}">Borrar</a>
         <a href="{% url 'base:edit-message' msg.id %}">Editar</a>
+        {% endif %}
         <hr>
-      {% endif %}
       </div>
     {% endfor %}
   </div>

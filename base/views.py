@@ -62,7 +62,9 @@ def home(req):
     )
   topics = Topic.objects.all().annotate(top_topics=Count('room')).order_by('-top_topics')
   room_count = rooms.count()
-  room_msg = Message.objects.all()
+  room_msg = Message.objects.all().filter(
+    Q(room__topic__name__icontains=q)
+  )
 
   context = {
     'topics': topics,
