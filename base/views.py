@@ -95,6 +95,13 @@ def room(req: HttpRequest, pk):
   }
   return render(req, 'base/room.html', context)
 
+def userProfile(req: HttpRequest, pk):
+  user = User.objects.get(pk=pk)
+  context = {
+    'user': user
+  }
+  return render(req, 'base/profile.html', context)
+
 @login_required(login_url='/login')
 def createRoom(req):
   form = RoomForm()
